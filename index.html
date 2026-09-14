@@ -1,1 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>신입사원 직장예절 퀴즈</title>
+<style>
+  :root{
+    --navy:#1F2D3D;
+    --navy-light:#2E425A;
+    --paper:#F6F3EC;
+    --ink:#2A2A28;
+    --stamp-red:#B5482A;
+    --stamp-green:#3E6B4F;
+    --line:#D8D2C4;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:24px 12px 60px;
+  }
+  .doc{
+    width:100%;
+    max-width:640px;
+  }
+  .letterhead{
+    background:var(--navy);
+    color:var(--paper);
+    padding:28px 24px 22px;
+    border-radius:4px 4px 0 0;
+    position:relative;
+  }
+  .letterhead .tag{
+    font-size:12px;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    opacity:.7;
+    margin-bottom:6px;
+  }
+  .letterhead h1{
+    margin:0;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:-0.5px;
+  }
+  .letterhead p{
+    margin:8px 0 0;
+    font-size:14px;
+    opacity:.85;
+    line-height:1.5;
+  }
+  .progress-wrap{
+    background:var(--navy-light);
+    padding:10px 24px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .progress-bar{
+    flex:1;
+    height:6px;
+    background:rgba(255,255,255,.2);
+    border-radius:3px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:#E8C468;
+    width:0%;
+    transition:width .3s ease;
+  }
+  .progress-text{
+    color:var(--paper);
+    font-size:12px;
+    white-space:nowrap;
+    opacity:.85;
+  }
+  .card{
+    background:#fff;
+    border:1px solid var(--line);
+    border-top:none;
+    padding:26px 24px;
+  }
+  .qnum{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;height:26px;
+    background:var(--navy);
+    color:var(--paper);
+    font-size:13px;
+    font-weight:700;
+    border-radius:50%;
+    margin-bottom:14px;
+  }
+  .prompt{
+    font-size:17px;
+    font-weight:700;
+    line-height:1.5;
+    margin:0 0 18px;
+    color:var(--navy);
+  }
+  .options{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .opt{
+    text-align:left;
+    padding:13px 16px;
+    border:1.5px solid var(--line);
+    border-radius:8px;
+    background:#fff;
+    font-size:14.5px;
+    line-height:1.5;
+    cursor:pointer;
+    color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .opt:hover:not(:disabled){
+    border-color:var(--navy);
+    background:#FAFAF7;
+  }
+  .opt:disabled{cursor:default;}
+  .opt.correct{
+    border-color:var(--stamp-green);
+    background:#EAF2EC;
+    color:var(--stamp-green);
+    font-weight:700;
+  }
+  .opt.wrong{
+    border-color:var(--stamp-red);
+    background:#FBEDE8;
+    color:var(--stamp-red);
+    font-weight:700;
+  }
+  .opt.dim{opacity:.45;}
+  .feedback{
+    margin-top:16px;
+    padding:14px 16px;
+    border-radius:8px;
+    font-size:13.5px;
+    line-height:1.6;
+    display:none;
+  }
+  .feedback.show{display:block;}
+  .feedback.ok{background:#EAF2EC;border-left:4px solid var(--stamp-green);}
+  .feedback.no{background:#FBEDE8;border-left:4px solid var(--stamp-red);}
+  .feedback b{display:block;margin-bottom:4px;font-size:14px;}
+  .next-btn{
+    margin-top:18px;
+    width:100%;
+    padding:13px;
+    background:var(--navy);
+    color:var(--paper);
+    border:none;
+    border-radius:8px;
+    font-size:14.5px;
+    font-weight:700;
+    cursor:pointer;
+    display:none;
+  }
+  .next-btn.show{display:block;}
+  .next-btn:hover{background:var(--navy-light);}
 
+  /* result screen */
+  .result{
+    background:#fff;
+    border:1px solid var(--line);
+    border-top:none;
+    padding:40px 24px;
+    text-align:center;
+    display:none;
+  }
+  .result.show{display:block;}
+  .stamp{
+    width:96px;height:96px;
+    margin:0 auto 20px;
+    border:3px solid var(--stamp-red);
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transform:rotate(-8deg);
+    color:var(--stamp-red);
+    font-weight:700;
+    font-size:14px;
+    line-height:1.3;
+  }
+  .result h2{
+    margin:0 0 6px;
+    color:var(--navy);
+    font-size:22px;
+  }
+  .score-num{
+    font-size:44px;
+    font-weight:800;
+    color:var(--navy);
+    margin:8px 0;
+  }
+  .score-msg{
+    font-size:14px;
+    color:#555;
+    margin-bottom:24px;
+    line-height:1.6;
+  }
+  .retry-btn{
+    padding:12px 28px;
+    background:var(--navy);
+    color:var(--paper);
+    border:none;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .retry-btn:hover{background:var(--navy-light);}
+  .footer-line{
+    text-align:center;
+    font-size:11px;
+    color:#999;
+    margin-top:14px;
+    letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+
+  <div class="letterhead">
+    <div class="tag">신입사원 교육자료</div>
+    <h1>직장예절 퀴즈</h1>
+    <p>전화응대 · 이메일 · 보고 · 메신저 사용, 8가지 상황으로 배우는 사회초년생 매너</p>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">0 / 8</div>
+  </div>
+
+  <div class="card" id="quizCard">
+    <div class="qnum" id="qnum">1</div>
+    <p class="prompt" id="qprompt"></p>
+    <div class="options" id="qoptions"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="nextBtn">다음 문제</button>
+  </div>
+
+  <div class="result" id="resultCard">
+    <div class="stamp" id="stamp">결과<br>확인</div>
+    <h2>퀴즈 완료!</h2>
+    <div class="score-num" id="scoreNum">0 / 8</div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <button class="retry-btn" id="retryBtn">다시 풀기</button>
+  </div>
+
+  <div class="footer-line">본인 이름을 적고 패들렛에 결과를 공유해 보세요</div>
+</div>
+
+<script>
+const questions = [
+  {
+    prompt: "회사 전화가 울렸을 때, 가장 적절한 첫 인사말은?",
+    options: [
+      "\"여보세요?\"",
+      "\"네, 감사합니다. OO팀 홍길동입니다.\"",
+      "\"누구세요?\"",
+      "\"잠시만요.\" (바로 보류)"
+    ],
+    correct: 1,
+    explain: "전화를 받을 때는 소속(부서)과 이름을 먼저 밝혀야 상대방이 제대로 연결되었는지 확인할 수 있습니다. '여보세요'는 사적인 전화에서 쓰는 표현이라 업무용으로는 적절하지 않아요."
+  },
+  {
+    prompt: "찾는 사람이 부재중일 때 전화를 받았습니다. 가장 적절한 대응은?",
+    options: [
+      "\"없는데요.\" 하고 끊는다",
+      "언제 돌아오는지 안내하고, 메모를 남길지 여쭤본다",
+      "개인 휴대폰 번호를 알려준다",
+      "그냥 다시 전화하라고 한다"
+    ],
+    correct: 1,
+    explain: "부재중인 사람 대신 전화를 받을 때는 부재 사유나 복귀 시간을 간단히 안내하고, 메모(전달사항)를 남길지 물어보는 것이 기본 매너입니다. 동료의 개인 연락처를 임의로 알려주는 것은 금물이에요."
+  },
+  {
+    prompt: "업무 이메일의 제목으로 가장 적절한 것은?",
+    options: [
+      "안녕하세요",
+      "질문있어요",
+      "[기획팀] 8월 정기회의 자료 요청 (~8/25까지)",
+      "제목 없음"
+    ],
+    correct: 2,
+    explain: "이메일 제목은 [부서/구분], 핵심 내용, 필요시 기한을 담아 한눈에 알아볼 수 있게 써야 합니다. 상대방이 하루에도 수십 통의 메일을 받는다는 걸 기억하세요."
+  },
+  {
+    prompt: "여러 사람에게 이메일을 보낼 때, 참고로만 알면 되는 사람은 어디에 넣어야 할까?",
+    options: [
+      "받는 사람(To)",
+      "참조(CC)",
+      "숨은 참조(BCC)",
+      "제목란에 이름 기재"
+    ],
+    correct: 1,
+    explain: "받는 사람(To)은 회신이나 조치가 필요한 사람, 참조(CC)는 내용을 공유받아야 하지만 직접 답할 필요는 없는 사람에게 사용합니다. 숨은 참조(BCC)는 받는 사람들 서로에게 이메일 주소가 노출되지 않게 할 때 씁니다."
+  },
+  {
+    prompt: "상사에게 업무 진행 상황을 보고할 때 가장 좋은 방식은?",
+    options: [
+      "결론부터 말하고, 필요하면 이유와 과정을 설명한다",
+      "있었던 일을 시간 순서대로 처음부터 끝까지 다 말한다",
+      "문제가 다 해결된 뒤에만 보고한다",
+      "상사가 먼저 물어볼 때까지 기다린다"
+    ],
+    correct: 0,
+    explain: "보고의 기본은 '결론(두괄식) → 이유 → 상세 내용' 순서입니다. 이렇게 하면 상사가 빠르게 핵심을 파악하고 필요한 만큼만 추가로 물어볼 수 있어요. 문제가 생겼을 때도 해결 전에 미리 보고하는 것이 중요합니다."
+  },
+  {
+    prompt: "업무 중 예상치 못한 문제가 발생했을 때, 신입사원의 올바른 태도는?",
+    options: [
+      "혼자 어떻게든 해결해보고, 안 되면 조용히 넘어간다",
+      "바로 상사나 선배에게 알리고 상의한다",
+      "다른 팀원에게만 살짝 이야기한다",
+      "일단 모른 척하고 다음 업무로 넘어간다"
+    ],
+    correct: 1,
+    explain: "문제 상황은 최대한 빨리 상사나 선배에게 공유해야 합니다. 이를 '이상 보고'라고 하며, 늦게 보고할수록 문제가 커지고 대응이 어려워집니다. 혼자 해결하려다 시간을 낭비하는 것보다 빠른 공유가 훨씬 낫습니다."
+  },
+  {
+    prompt: "회사 메신저(예: 사내톡)로 선배에게 업무 요청을 할 때, 가장 적절한 방식은?",
+    options: [
+      "\"넵\" 한 마디만 계속 보낸다",
+      "\"바쁘세요?\"만 보내고 답장을 기다린다",
+      "용건과 필요한 내용을 한 번에 명확하게 정리해서 보낸다",
+      "이모티콘만 여러 개 보낸다"
+    ],
+    correct: 2,
+    explain: "메신저에서도 용건, 필요한 내용, 원하는 회신 기한 등을 한 번에 정리해서 보내는 것이 좋습니다. '바쁘세요?'처럼 용건 없이 말을 거는 것은 상대방을 기다리게 만들어 오히려 실례가 될 수 있어요."
+  },
+  {
+    prompt: "업무 시간 외(예: 밤 11시)에 상사에게 급하지 않은 메신저 메시지를 보내야 할 상황이라면?",
+    options: [
+      "생각날 때 바로 보낸다",
+      "업무 시간에 다시 보내거나, 예약 전송 기능을 활용한다",
+      "전화를 걸어서 확인한다",
+      "여러 번 나눠서 계속 보낸다"
+    ],
+    correct: 1,
+    explain: "급한 용건이 아니라면 업무 시간 외 연락은 자제하는 것이 좋습니다. 메신저의 예약 전송 기능을 활용하거나, 다음날 업무 시간에 보내는 것이 상대방의 사생활을 존중하는 매너입니다."
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+
+const qnum = document.getElementById('qnum');
+const qprompt = document.getElementById('qprompt');
+const qoptions = document.getElementById('qoptions');
+const feedback = document.getElementById('feedback');
+const nextBtn = document.getElementById('nextBtn');
+const progressFill = document.getElementById('progressFill');
+const progressText = document.getElementById('progressText');
+const quizCard = document.getElementById('quizCard');
+const resultCard = document.getElementById('resultCard');
+const progressWrap = document.querySelector('.progress-wrap');
+
+function renderQuestion(){
+  answered = false;
+  const q = questions[current];
+  qnum.textContent = current + 1;
+  qprompt.textContent = q.prompt;
+  qoptions.innerHTML = '';
+  feedback.className = 'feedback';
+  feedback.innerHTML = '';
+  nextBtn.className = 'next-btn';
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => selectOption(idx));
+    qoptions.appendChild(btn);
+  });
+
+  progressFill.style.width = (current / questions.length * 100) + '%';
+  progressText.textContent = current + ' / ' + questions.length;
+}
+
+function selectOption(idx){
+  if(answered) return;
+  answered = true;
+  const q = questions[current];
+  const buttons = qoptions.querySelectorAll('.opt');
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if(i === q.correct){
+      b.classList.add('correct');
+    } else if(i === idx){
+      b.classList.add('wrong');
+    } else {
+      b.classList.add('dim');
+    }
+  });
+
+  const isCorrect = idx === q.correct;
+  if(isCorrect) score++;
+
+  feedback.className = 'feedback show ' + (isCorrect ? 'ok' : 'no');
+  feedback.innerHTML = '<b>' + (isCorrect ? '정답이에요!' : '아쉬워요, 오답이에요.') + '</b>' + q.explain;
+
+  nextBtn.className = 'next-btn show';
+  nextBtn.textContent = (current === questions.length - 1) ? '결과 보기' : '다음 문제';
+}
+
+nextBtn.addEventListener('click', () => {
+  current++;
+  if(current >= questions.length){
+    showResult();
+  } else {
+    renderQuestion();
+  }
+});
+
+function showResult(){
+  quizCard.style.display = 'none';
+  progressWrap.style.display = 'none';
+  resultCard.className = 'result show';
+  document.getElementById('scoreNum').textContent = score + ' / ' + questions.length;
+
+  let msg = '';
+  if(score === questions.length){
+    msg = '완벽해요! 직장예절 만렙이네요. 실전에서도 자신있게 적용해보세요.';
+  } else if(score >= questions.length * 0.6){
+    msg = '꽤 잘했어요! 틀린 부분의 설명을 한 번 더 읽어보면 완벽해질 거예요.';
+  } else {
+    msg = '괜찮아요, 처음엔 다 서툴러요. 설명을 다시 읽고 한 번 더 도전해보세요.';
+  }
+  document.getElementById('scoreMsg').textContent = msg;
+}
+
+document.getElementById('retryBtn').addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  resultCard.className = 'result';
+  quizCard.style.display = 'block';
+  progressWrap.style.display = 'flex';
+  renderQuestion();
+});
+
+renderQuestion();
+</script>
+</body>
+</html>
